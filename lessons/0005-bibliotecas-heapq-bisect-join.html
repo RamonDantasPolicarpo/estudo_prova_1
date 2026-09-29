@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 05 — heapq, bisect, join e Conceitos Finais</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+
+<span class="lesson-number">Lição 05</span>
+<h1>Bibliotecas Python: heapq, bisect e Strings</h1>
+<p class="subtitle">As ferramentas avançadas do Kahoot 4 — fila de prioridade, busca binária pronta, e concatenação eficiente.</p>
+
+<!-- ===== HEAPQ ===== -->
+<h2>🏔️ <code>heapq</code> — Fila de Prioridade</h2>
+
+<p>Um <strong>heap</strong> (monte) é uma estrutura em forma de árvore binária onde o <strong>menor elemento está sempre na raiz</strong> (topo). Isso é chamado de <strong>min-heap</strong>.</p>
+
+<div class="diagram">
+   Min-Heap visual:
+   
+          1          ← menor sempre no topo
+         / \
+        3    2
+       / \
+      7    4
+   
+   heapq em Python usa uma lista:
+   [1, 3, 2, 7, 4]
+    ↑ heap[0] é sempre o menor
+</div>
+
+<h3>Operações principais</h3>
+<pre><code><span class="kw">import</span> heapq
+
+heap = []
+heapq.heappush(heap, <span class="num">5</span>)    <span class="cmt"># insere 5</span>
+heapq.heappush(heap, <span class="num">1</span>)    <span class="cmt"># insere 1</span>
+heapq.heappush(heap, <span class="num">3</span>)    <span class="cmt"># insere 3</span>
+
+<span class="fn">print</span>(heap[<span class="num">0</span>])              <span class="cmt"># 1 (menor, sem remover)</span>
+
+menor = heapq.heappop(heap) <span class="cmt"># remove e retorna o menor</span>
+<span class="fn">print</span>(menor)                <span class="cmt"># 1</span></code></pre>
+
+<div class="callout java">
+  <strong>🔶 Conexão com Java</strong>
+  <code>heapq</code> em Python ≈ <code>PriorityQueue</code> em Java.<br>
+  <code>heappush()</code> → <code>pq.add()</code><br>
+  <code>heappop()</code> → <code>pq.poll()</code><br>
+  Ambos são min-heap por padrão (menor sai primeiro).
+</div>
+
+<h3>Simulando Max-Heap: negar os valores</h3>
+
+<p><code>heapq</code> é sempre min-heap. Para fazer um <strong>max-heap</strong> (maior sai primeiro), você <strong>nega os pesos</strong> ao inserir:</p>
+
+<pre><code><span class="kw">import</span> heapq
+
+heap = []
+heapq.heappush(heap, -<span class="num">5</span>)   <span class="cmt"># insere -5 (representa 5)</span>
+heapq.heappush(heap, -<span class="num">1</span>)   <span class="cmt"># insere -1 (representa 1)</span>
+heapq.heappush(heap, -<span class="num">3</span>)   <span class="cmt"># insere -3 (representa 3)</span>
+
+maior = -heapq.heappop(heap) <span class="cmt"># pop dá -5, negando: 5</span>
+<span class="fn">print</span>(maior)                  <span class="cmt"># 5 (o maior!)</span></code></pre>
+
+<div class="callout important">
+  <strong>⚠️ Do Kahoot</strong>
+  "Como simular fila de prioridade máxima com heapq?" → <strong>Negar pesos</strong><br>
+  "Qual estrutura para fila de prioridade com extração frequente?" → <strong>heapq</strong>
+</div>
+
+<!-- ===== BISECT ===== -->
+<h2>🔪 <code>bisect</code> — Busca Binária Pronta</h2>
+
+<p>O módulo <code>bisect</code> faz busca binária automaticamente em uma lista <strong>já ordenada</strong>. Ele diz <em>onde</em> inserir um elemento para manter a lista ordenada.</p>
+
+<pre><code><span class="kw">import</span> bisect
+
+v = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>]
+
+pos = bisect.bisect_left(v, <span class="num">30</span>)   <span class="cmt"># 2 (insere ANTES do 30)</span>
+pos = bisect.bisect_right(v, <span class="num">30</span>)  <span class="cmt"># 3 (insere DEPOIS do 30)</span></code></pre>
+
+<h3><code>bisect_left</code> vs <code>bisect_right</code></h3>
+
+<div class="diagram">
+   Lista: [10, 20, 30, 30, 40]
+                   ↑   ↑
+   bisect_left(30):  posição 2 (borda ESQUERDA das duplicatas)
+   bisect_right(30): posição 4 (borda DIREITA das duplicatas)
+   
+   left → insere ANTES dos iguais
+   right → insere DEPOIS dos iguais
+</div>
+
+<div class="callout">
+  <strong>Do Kahoot</strong>
+  "Qual diferença entre bisect_left e bisect_right ao inserir duplicatas?" → <strong>Posição em borda</strong><br>
+  <code>bisect_left</code> = borda esquerda; <code>bisect_right</code> = borda direita.
+</div>
+
+<!-- ===== STRINGS ===== -->
+<h2>📝 Strings: <code>join</code> vs <code>+</code></h2>
+
+<p>Concatenar strings com <code>+</code> em um loop é <strong>ineficiente</strong> porque strings em Python são <strong>imutáveis</strong> — cada <code>+</code> cria uma cópia nova na memória.</p>
+
+<div class="diagram">
+   Concatenando com "+":
+   
+   resultado = ""
+   resultado = resultado + "A"     → cria nova string "A"
+   resultado = resultado + "B"     → cria nova string "AB"
+   resultado = resultado + "C"     → cria nova string "ABC"
+   
+   3 strings criadas = 3 cópias! Em 10.000 iterações = 10.000 cópias!
+   
+   ────────────────────────────────────────
+   
+   Concatenando com join:
+   
+   lista = ["A", "B", "C"]
+   resultado = "".join(lista)      → UMA cópia final: "ABC"
+   
+   1 string criada! Sempre 1, independente do tamanho.
+</div>
+
+<pre><code><span class="cmt"># ❌ Lento: cópias repetidas a cada iteração</span>
+resultado = <span class="str">""</span>
+<span class="kw">for</span> letra <span class="kw">in</span> lista:
+    resultado += letra     <span class="cmt"># cria nova string toda vez</span>
+
+<span class="cmt"># ✅ Rápido: uma cópia final</span>
+resultado = <span class="str">""</span>.join(lista) <span class="cmt"># junta tudo de uma vez</span></code></pre>
+
+<div class="callout java">
+  <strong>🔶 Conexão com Java</strong>
+  É o mesmo problema de <code>String += </code> vs <code>StringBuilder</code>.<br>
+  <code>"".join(lista)</code> em Python ≈ <code>sb.toString()</code> em Java.
+</div>
+
+<div class="callout important">
+  <strong>⚠️ Do Kahoot</strong>
+  "Por que concatenar com '+' em loop é trabalhoso?" → <strong>Cópias repetidas</strong><br>
+  "Como concatenar muitas strings de forma linear?" → <strong><code>"".join(lista)</code></strong><br>
+  "Como join reduz o custo?" → <strong>Uma cópia final</strong>
+</div>
+
+<!-- ===== ESCOLHA DA ESTRUTURA ===== -->
+<h2>🎯 Critério de Escolha: list vs deque vs heapq</h2>
+
+<p>Cada estrutura resolve um problema diferente. O critério de escolha é: <strong>quais operações você precisa fazer com mais frequência?</strong></p>
+
+<table>
+  <tr><th>Preciso de…</th><th>Use</th><th>Por quê</th></tr>
+  <tr><td>LIFO (pilha)</td><td><code>list</code></td><td><code>append</code>+<code>pop</code> no final são O(1)</td></tr>
+  <tr><td>FIFO (fila)</td><td><code>deque</code></td><td><code>append</code>+<code>popleft</code> são O(1)</td></tr>
+  <tr><td>Prioridade (menor/maior)</td><td><code>heapq</code></td><td>Extração do min em O(log n)</td></tr>
+  <tr><td>Manter lista ordenada</td><td><code>bisect</code></td><td>Busca binária em O(log n)</td></tr>
+</table>
+
+<div class="callout tip">
+  <strong>💡 Do Kahoot</strong>
+  "Entre list, deque e heapq, qual critério orienta a escolha prática?" → <strong>Operações alvo</strong><br>
+  Escolha a estrutura baseado na operação que você mais vai executar.
+</div>
+
+<!-- ===== FATOS CURIOSOS ===== -->
+<h2>📅 Fato Histórico</h2>
+
+<div class="callout">
+  <strong>Do Kahoot</strong>
+  "Quando foram criadas as primeiras estruturas de dados em Python?" → <strong>1989</strong><br>
+  Guido van Rossum começou a desenvolver Python em dezembro de 1989.
+</div>
+
+<!-- ===== QUIZ ===== -->
+<h2>🎯 Teste Seu Conhecimento</h2>
+
+<div class="quiz" data-quiz="q1">
+  <h3>1. Como simular fila de prioridade máxima com heapq?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Negar pesos</li>
+    <li>Usar max_heap()</li>
+    <li>Inverter a lista</li>
+    <li>Usar sort reverso</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! heapq é sempre min-heap. Para max-heap, negue os valores ao inserir.</div>
+  <div class="quiz-feedback wrong">❌ heapq é min-heap. O truque é negar os valores: push(-5) e depois -heappop().</div>
+</div>
+
+<div class="quiz" data-quiz="q2">
+  <h3>2. Qual diferença entre bisect_left e bisect_right com duplicatas?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Posição em borda</li>
+    <li>Velocidade</li>
+    <li>Tipo de retorno</li>
+    <li>Ordem de busca</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Exato! bisect_left insere na borda esquerda dos iguais, bisect_right na direita.</div>
+  <div class="quiz-feedback wrong">❌ A diferença é a posição em borda: left = antes dos iguais, right = depois dos iguais.</div>
+</div>
+
+<div class="quiz" data-quiz="q3">
+  <h3>3. Por que "+" em loop grande é ruim para strings?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Cópias repetidas</li>
+    <li>Erros de tipo</li>
+    <li>Limite de tamanho</li>
+    <li>Lentidão do print</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Sim! Strings são imutáveis — cada "+" cria uma nova cópia na memória.</div>
+  <div class="quiz-feedback wrong">❌ Strings em Python são imutáveis. Cada "+" cria uma cópia nova = cópias repetidas.</div>
+</div>
+
+<div class="quiz" data-quiz="q4">
+  <h3>4. Como concatenar muitas strings de forma eficiente?</h3>
+  <ul class="quiz-options">
+    <li data-correct>"".join(lista)</li>
+    <li>resultado += letra</li>
+    <li>concat(a, b)</li>
+    <li>str.add(x)</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Perfeito! join faz uma única cópia final, independente do tamanho.</div>
+  <div class="quiz-feedback wrong">❌ "".join(lista) é o jeito eficiente — faz UMA cópia final em vez de N cópias.</div>
+</div>
+
+<div class="quiz" data-quiz="q5">
+  <h3>5. Qual estrutura para fila de prioridade com extração frequente?</h3>
+  <ul class="quiz-options">
+    <li data-correct>heapq</li>
+    <li>list</li>
+    <li>deque</li>
+    <li>bisect</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! heapq é otimizado para inserir e extrair o menor (ou maior) elemento rapidamente.</div>
+  <div class="quiz-feedback wrong">❌ heapq é a estrutura certa — extração do min/max em O(log n), perfeito para prioridade.</div>
+</div>
+
+<div class="quiz" data-quiz="q6">
+  <h3>6. Entre list, deque e heapq, qual critério orienta a escolha?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Operações alvo</li>
+    <li>Tamanho dos dados</li>
+    <li>Tipo dos dados</li>
+    <li>Versão do Python</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Exato! A escolha depende de quais operações você precisa fazer com mais frequência.</div>
+  <div class="quiz-feedback wrong">❌ O critério é "operações alvo" — escolha baseado no que você mais vai fazer (LIFO? FIFO? prioridade?).</div>
+</div>
+
+<div class="quiz" data-quiz="q7">
+  <h3>7. O que sorted() faz com um gerador antes de ordenar?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Consome inteiro</li>
+    <li>Ordena parcial</li>
+    <li>Descarta vazio</li>
+    <li>Converte em tupla</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Sim! sorted() precisa ver todos os elementos, então consome o gerador inteiro em memória.</div>
+  <div class="quiz-feedback wrong">❌ sorted() consome o gerador inteiro — precisa de todos os dados na memória antes de poder ordenar.</div>
+</div>
+
+<!-- ===== RESUMO ===== -->
+<h2>📋 Resumo Final: Todas as Estruturas</h2>
+<table>
+  <tr><th>Estrutura</th><th>Tipo</th><th>Operações</th><th>Quando usar</th></tr>
+  <tr><td><code>list</code></td><td>Pilha (LIFO)</td><td><code>append</code> + <code>pop</code></td><td>Desfazer, recursão, inverter</td></tr>
+  <tr><td><code>deque</code></td><td>Fila (FIFO)</td><td><code>append</code> + <code>popleft</code></td><td>Atendimento, impressão</td></tr>
+  <tr><td><code>heapq</code></td><td>Prioridade</td><td><code>heappush</code> + <code>heappop</code></td><td>Prioridade, extração min/max</td></tr>
+  <tr><td><code>bisect</code></td><td>Busca binária</td><td><code>bisect_left</code> / <code>bisect_right</code></td><td>Manter lista ordenada</td></tr>
+  <tr><td><code>"".join()</code></td><td>Concatenação</td><td>Uma cópia final</td><td>Juntar muitas strings</td></tr>
+</table>
+
+<!-- ===== LEITURA ===== -->
+<h2>📚 Leitura Recomendada</h2>
+<p>
+  <a href="https://docs.python.org/3/library/heapq.html" target="_blank">📖 Docs Python: heapq</a> — Heap queue algorithm<br>
+  <a href="https://docs.python.org/3/library/bisect.html" target="_blank">📖 Docs Python: bisect</a> — Array bisection algorithm
+</p>
+
+<div class="callout tip">
+  <strong>🤖 Ficou com dúvida?</strong>
+  Essas bibliotecas parecem muito, mas na prova o que cai é entender <em>quando usar cada uma</em>. Se ficou confuso em alguma, me pergunta!
+</div>
+
+<!-- ===== NAV ===== -->
+<div class="nav-links">
+  <a href="0004-ordenacao-insertion-sort.html">← Lição 04: Ordenação</a>
+  <span>Revisão Final →</span>
+</div>
+
+<div class="footer">
+  Algoritmos e Estrutura de Dados — CEUB 4º Semestre — Estudo para Prova 1
+</div>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

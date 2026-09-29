@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 02 — Fila (Queue): FIFO e deque</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+
+<span class="lesson-number">Lição 02</span>
+<h1>Fila (Queue): Primeiro a Entrar, Primeiro a Sair</h1>
+<p class="subtitle">FIFO, por que <code>list</code> não serve, e como <code>deque</code> resolve tudo.</p>
+
+<!-- ===== CONCEITO ===== -->
+<h2>🧠 O Conceito</h2>
+
+<p>Uma <strong>fila</strong> é uma estrutura de dados onde o <strong>primeiro</strong> elemento inserido é o <strong>primeiro</strong> a ser removido. Isso se chama <strong>FIFO</strong> — <em>First In, First Out</em>.</p>
+
+<div class="callout">
+  <strong>Analogia do mundo real</strong>
+  Pense na fila do banco ou do sistema de impressão. Quem chega primeiro é atendido primeiro. Não tem como o último da fila furar e ser atendido antes.
+</div>
+
+<p>Compare com a Pilha que você acabou de aprender:</p>
+<table>
+  <tr><th>Estrutura</th><th>Regra</th><th>Sigla</th><th>Analogia</th></tr>
+  <tr><td><strong>Pilha</strong></td><td>Último entra, primeiro sai</td><td>LIFO</td><td>Pilha de pratos</td></tr>
+  <tr><td><strong>Fila</strong></td><td>Primeiro entra, primeiro sai</td><td>FIFO</td><td>Fila de banco</td></tr>
+</table>
+
+<p>As operações fundamentais:</p>
+<table>
+  <tr><th>Operação</th><th>O que faz</th><th>Em Python (deque)</th><th>Em Java (Queue)</th></tr>
+  <tr><td><strong>Enqueue</strong> (enfileirar)</td><td>Coloca no final</td><td><code>fila.append(x)</code></td><td><code>queue.add(x)</code></td></tr>
+  <tr><td><strong>Dequeue</strong> (desenfileirar)</td><td>Remove do início</td><td><code>fila.popleft()</code></td><td><code>queue.poll()</code></td></tr>
+</table>
+
+<!-- ===== VISUAL ===== -->
+<h2>👁️ Visualizando</h2>
+
+<div class="diagram">
+   Entrada (append)                              Saída (popleft)
+   ───────────►                                  ───────────►
+
+                ┌──────┬──────┬──────┐
+                │  10  │  20  │  30  │
+                └──────┴──────┴──────┘
+                 início              fim
+
+   append(40):  ┌──────┬──────┬──────┬──────┐
+                │  10  │  20  │  30  │  40  │
+                └──────┴──────┴──────┴──────┘
+
+   popleft():   ┌──────┬──────┬──────┐
+                                 │  20  │  30  │  40  │         → retorna 10
+                └──────┴──────┴──────┘
+</div>
+
+<p>Entra pelo final, sai pelo início. Duas pontas diferentes — esse é o ponto-chave.</p>
+
+<!-- ===== O PROBLEMA DO LIST ===== -->
+<h2>🚨 Por Que NÃO Usar <code>list</code> Para Fila</h2>
+
+<p>Você poderia fazer <code>fila.pop(0)</code> para tirar o primeiro elemento de uma lista. Mas isso é um <strong>gargalo</strong>:</p>
+
+<div class="diagram">
+   pop(0) numa lista de 1000 elementos:
+   
+   [A, B, C, D, E, ... , Z]
+    ↑ remove A
+   
+   Agora TODOS os 999 elementos precisam se mover uma posição:
+   [B, C, D, E, ... , Z]
+    ← ← ← ← ← ← ← ←
+   
+   Isso é O(n) — quanto maior a lista, mais lento!
+</div>
+
+<div class="callout important">
+  <strong>⚠️ Do Kahoot (Pergunta 1, Kahoot 4)</strong>
+  "Ao implementar uma fila FIFO com list, qual operação se torna gargalo?" → <strong><code>pop(0)</code></strong><br>
+  Porque remove do início e precisa mover todos os outros elementos.
+</div>
+
+<!-- ===== DEQUE ===== -->
+<h2>✅ A Solução: <code>collections.deque</code></h2>
+
+<p><code>deque</code> (pronuncia-se "déck") significa <strong>Double-Ended Queue</strong> — fila de duas pontas. É uma estrutura feita de <strong>blocos ligados</strong> (não um array contíguo), então inserir e remover nas duas pontas é instantâneo (<strong>O(1)</strong>).</p>
+
+<pre><code><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="cmt"># Criar fila vazia</span>
+fila = deque()
+
+<span class="cmt"># Enfileirar (entrada no fim)</span>
+fila.append(<span class="num">10</span>)    <span class="cmt"># deque([10])</span>
+fila.append(<span class="num">20</span>)    <span class="cmt"># deque([10, 20])</span>
+fila.append(<span class="num">30</span>)    <span class="cmt"># deque([10, 20, 30])</span>
+
+<span class="cmt"># Desenfileirar (saída do início)</span>
+primeiro = fila.popleft()   <span class="cmt"># primeiro = 10</span>
+<span class="fn">print</span>(primeiro)              <span class="cmt"># Saída: 10</span></code></pre>
+
+<div class="callout java">
+  <strong>🔶 Conexão com Java</strong>
+  <code>from collections import deque</code> é como fazer <code>import java.util.LinkedList;</code><br>
+  <code>fila.append(x)</code> → <code>queue.add(x)</code><br>
+  <code>fila.popleft()</code> → <code>queue.poll()</code><br>
+  O conceito é o mesmo — a diferença é que em Python você precisa importar do módulo <code>collections</code>.
+</div>
+
+<h3>A combinação mágica: <code>append</code> + <code>popleft</code></h3>
+
+<div class="callout tip">
+  <strong>💡 Regra de Ouro</strong>
+  Para FIFO com deque: <strong><code>append()</code></strong> coloca no fim + <strong><code>popleft()</code></strong> tira do início.<br>
+  É a "entrada no fim, saída no início" — respeita a ordem de chegada naturalmente.
+</div>
+
+<p>Compare as duas abordagens de estrutura:</p>
+<table>
+  <tr><th>Estrutura</th><th>Operações</th><th>O que faz</th></tr>
+  <tr><td><strong>Pilha</strong> (LIFO)</td><td><code>append()</code> + <code>pop()</code></td><td>Entra e sai pela <strong>mesma ponta</strong> (fim)</td></tr>
+  <tr><td><strong>Fila</strong> (FIFO)</td><td><code>append()</code> + <code>popleft()</code></td><td>Entra por uma ponta, sai pela <strong>outra</strong></td></tr>
+</table>
+
+<!-- ===== EXEMPLOS DO KAHOOT ===== -->
+<h2>💻 Exemplos dos Kahoots</h2>
+
+<h3>Exemplo 1: Fila com adição e remoção</h3>
+<pre><code><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+fila = deque([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>])
+
+fila.popleft()       <span class="cmt"># remove 10 (o primeiro)</span>
+fila.append(<span class="num">50</span>)      <span class="cmt"># adiciona 50 no final</span>
+
+<span class="fn">print</span>(fila)           <span class="cmt"># deque([20, 30, 40, 50])</span></code></pre>
+
+<p>Saiu o 10 (primeiro da fila), entrou o 50 (no final). A fila "andou".</p>
+
+<h3>Exemplo 2: Fila com range</h3>
+<pre><code><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+fila = deque()
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>):     <span class="cmt"># 1, 2, 3, 4, 5</span>
+    fila.append(i)
+
+<span class="fn">print</span>(fila.popleft())      <span class="cmt"># 1 (primeiro que entrou)</span>
+<span class="fn">print</span>(fila.popleft())      <span class="cmt"># 2 (segundo que entrou)</span></code></pre>
+
+<h3>Como identificar: é Pilha ou Fila?</h3>
+<div class="callout">
+  <strong>Dica de prova</strong>
+  Olhe para as operações de remoção:<br>
+  • Usa <code>pop()</code> (remove do fim)? → <strong>Pilha (LIFO)</strong><br>
+  • Usa <code>popleft()</code> (remove do início)? → <strong>Fila (FIFO)</strong><br>
+  Ambas usam <code>append()</code> para inserir. A diferença está em <em>onde remove</em>.
+</div>
+
+<!-- ===== LISTA CIRCULAR ===== -->
+<h2>🔄 Lista Circular e Escalonamento</h2>
+
+<p>Uma <strong>lista circular</strong> é como uma fila onde o último elemento aponta de volta para o primeiro, formando um ciclo. Ela permite <strong>percurso contínuo</strong> — útil em:</p>
+<ul>
+  <li><strong>Escalonamento de processos:</strong> o sistema operacional alterna entre processos em ciclo (round-robin)</li>
+  <li><strong>Buffers circulares:</strong> áudio, streaming — quando chega no fim, volta pro começo</li>
+</ul>
+
+<div class="diagram">
+   Lista circular:
+   
+   ┌──── A ◄──── D ◄───┐
+   │                    │
+   └───► B ────► C ─────┘
+   
+   Percurso: A → B → C → D → A → B → C → D → ...
+   Nunca termina — percurso contínuo!
+</div>
+
+<!-- ===== QUIZ ===== -->
+<h2>🎯 Teste Seu Conhecimento</h2>
+
+<div class="quiz" data-quiz="q1">
+  <h3>1. Qual é a saída?</h3>
+  <pre><code>from collections import deque
+fila = deque()
+fila.append(10)
+fila.append(20)
+fila.append(30)
+print(fila.popleft())</code></pre>
+  <ul class="quiz-options">
+    <li data-correct>10</li>
+    <li>30</li>
+    <li>20</li>
+    <li>[20, 30]</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! popleft() remove o primeiro — o 10, que chegou primeiro (FIFO).</div>
+  <div class="quiz-feedback wrong">❌ popleft() remove do INÍCIO. O 10 entrou primeiro, então sai primeiro.</div>
+</div>
+
+<div class="quiz" data-quiz="q2">
+  <h3>2. Qual operação é gargalo ao usar list como fila?</h3>
+  <ul class="quiz-options">
+    <li data-correct>pop(0)</li>
+    <li>append()</li>
+    <li>popleft()</li>
+    <li>insert()</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Exato! pop(0) precisa mover todos os elementos — O(n). Por isso usamos deque.</div>
+  <div class="quiz-feedback wrong">❌ pop(0) é o gargalo! Remover do início de uma list desloca todos os outros elementos.</div>
+</div>
+
+<div class="quiz" data-quiz="q3">
+  <h3>3. Qual combinação de métodos implementa FIFO com deque?</h3>
+  <ul class="quiz-options">
+    <li data-correct>append + popleft</li>
+    <li>append + pop</li>
+    <li>appendleft + pop</li>
+    <li>insert + remove</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Perfeito! append (entra no fim) + popleft (sai do início) = FIFO.</div>
+  <div class="quiz-feedback wrong">❌ FIFO = entrada no fim (append) + saída no início (popleft). append+pop seria LIFO (Pilha).</div>
+</div>
+
+<div class="quiz" data-quiz="q4">
+  <h3>4. Por que deque é mais indicado que list para operações nas duas pontas?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Blocos ligados</li>
+    <li>Array contíguo</li>
+    <li>Menor memória</li>
+    <li>Sintaxe simples</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! deque usa blocos ligados internamente, permitindo O(1) nas duas pontas.</div>
+  <div class="quiz-feedback wrong">❌ A resposta é "blocos ligados". deque não é um array contíguo — usa blocos de memória ligados entre si, o que permite inserir/remover O(1) em ambas as pontas.</div>
+</div>
+
+<div class="quiz" data-quiz="q5">
+  <h3>5. Como uma fila ajuda em sistemas de atendimento?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Organizar ordens</li>
+    <li>Inverter ordens</li>
+    <li>Eliminar duplicatas</li>
+    <li>Ordenar prioridades</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Sim! A fila organiza a ordem de atendimento — quem chegou primeiro, é atendido primeiro.</div>
+  <div class="quiz-feedback wrong">❌ A fila organiza ordens de atendimento, garantindo que quem chegou primeiro seja atendido primeiro (FIFO).</div>
+</div>
+
+<div class="quiz" data-quiz="q6">
+  <h3>6. Você quer acesso LIFO simples — qual estrutura padrão de Python é mais direta?</h3>
+  <ul class="quiz-options">
+    <li data-correct>List</li>
+    <li>Deque</li>
+    <li>Heapq</li>
+    <li>Tuple</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! Para LIFO simples (pilha), list com append+pop é a mais direta em Python.</div>
+  <div class="quiz-feedback wrong">❌ Para LIFO simples, list é a resposta. append() e pop() no final são O(1) — não precisa de deque.</div>
+</div>
+
+<div class="quiz" data-quiz="q7">
+  <h3>7. Como lista circular ajuda em escalonamento?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Percurso contínuo</li>
+    <li>Acesso aleatório</li>
+    <li>Ordenação rápida</li>
+    <li>Busca binária</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Perfeito! Lista circular permite percurso contínuo — o último aponta pro primeiro, ideal para round-robin.</div>
+  <div class="quiz-feedback wrong">❌ Lista circular permite percurso contínuo — ao chegar no fim, volta pro início sem parar.</div>
+</div>
+
+<!-- ===== RESUMO ===== -->
+<h2>📋 Resumo: Pilha vs Fila</h2>
+<table>
+  <tr><th>Aspecto</th><th>Pilha (Stack)</th><th>Fila (Queue)</th></tr>
+  <tr><td>Regra</td><td>LIFO</td><td>FIFO</td></tr>
+  <tr><td>Python</td><td><code>list</code></td><td><code>deque</code></td></tr>
+  <tr><td>Inserir</td><td><code>append()</code></td><td><code>append()</code></td></tr>
+  <tr><td>Remover</td><td><code>pop()</code> (fim)</td><td><code>popleft()</code> (início)</td></tr>
+  <tr><td>Analogia</td><td>Pilha de pratos</td><td>Fila do banco</td></tr>
+  <tr><td>Onde remove</td><td>Mesma ponta</td><td>Ponta oposta</td></tr>
+</table>
+
+<!-- ===== LEITURA ===== -->
+<h2>📚 Leitura Recomendada</h2>
+<p>
+  <a href="https://docs.python.org/3/library/collections.html#collections.deque" target="_blank">
+    📖 Docs Python: collections.deque
+  </a> — Referência oficial com todos os métodos e exemplos.
+</p>
+
+<!-- ===== FOLLOW-UP ===== -->
+<div class="callout tip">
+  <strong>🤖 Ficou com dúvida?</strong>
+  Pergunte ao Antigravity! A diferença entre Pilha e Fila é sutil — os dois usam <code>append()</code>, a mágica está em <em>onde</em> se remove. Se isso ainda não ficou 100%, me pergunta!
+</div>
+
+<!-- ===== NAV ===== -->
+<div class="nav-links">
+  <a href="0001-pilha-lifo-stack.html">← Lição 01: Pilha (LIFO)</a>
+  <a href="0003-busca-linear-binaria.html">Lição 03: Busca →</a>
+</div>
+
+<div class="footer">
+  Algoritmos e Estrutura de Dados — CEUB 4º Semestre — Estudo para Prova 1
+</div>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

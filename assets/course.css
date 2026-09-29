@@ -1,0 +1,207 @@
+/* ============================================
+   Algoritmos & Estrutura de Dados — Course CSS
+   Clean, Tufte-inspired, print-friendly
+   ============================================ */
+
+:root {
+  --bg: #fffcf7;
+  --fg: #2d2d2d;
+  --accent: #1a73e8;
+  --accent-light: #e8f0fe;
+  --success: #0d904f;
+  --success-light: #e6f4ea;
+  --error: #d93025;
+  --error-light: #fce8e6;
+  --warning: #f9ab00;
+  --warning-light: #fef7e0;
+  --border: #dadce0;
+  --code-bg: #f8f9fa;
+  --mono: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace;
+  --serif: 'Georgia', 'Cambria', 'Times New Roman', serif;
+  --sans: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 18px; }
+
+body {
+  font-family: var(--sans);
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.65;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* Typography */
+h1 { font-size: 2rem; font-weight: 700; margin: 0 0 0.3rem; color: var(--accent); }
+h2 { font-size: 1.4rem; font-weight: 600; margin: 2rem 0 0.8rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.3rem; }
+h3 { font-size: 1.15rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
+p { margin: 0.6rem 0; }
+
+.subtitle { font-size: 1rem; color: #666; margin-bottom: 1.5rem; }
+.lesson-number { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; }
+
+/* Links */
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+a:hover { border-bottom-color: var(--accent); }
+
+/* Code */
+code {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  background: var(--code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  line-height: 1.5;
+}
+
+pre code { background: none; padding: 0; font-size: 0.85rem; }
+
+/* Keyword highlighting (manual classes) */
+.kw { color: #8b008b; font-weight: 600; }  /* keywords */
+.fn { color: #0000cd; }                      /* functions */
+.str { color: #006400; }                     /* strings */
+.num { color: #b5651d; }                     /* numbers */
+.cmt { color: #888; font-style: italic; }    /* comments */
+
+/* Callout boxes */
+.callout {
+  border-left: 4px solid var(--accent);
+  background: var(--accent-light);
+  padding: 0.8rem 1rem;
+  margin: 1rem 0;
+  border-radius: 0 6px 6px 0;
+}
+.callout.java {
+  border-left-color: #f89820;
+  background: #fff8ed;
+}
+.callout.tip {
+  border-left-color: var(--success);
+  background: var(--success-light);
+}
+.callout.warn {
+  border-left-color: var(--warning);
+  background: var(--warning-light);
+}
+.callout.important {
+  border-left-color: var(--error);
+  background: var(--error-light);
+}
+.callout strong:first-child { display: block; margin-bottom: 0.3rem; }
+
+/* Comparison tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  text-align: left;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+}
+th { background: var(--accent-light); font-weight: 600; }
+tr:nth-child(even) { background: #fafafa; }
+
+/* Visual diagrams (ASCII art boxes) */
+.diagram {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  text-align: center;
+  line-height: 1.4;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Quiz widget */
+.quiz {
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin: 1.5rem 0;
+  background: white;
+}
+.quiz h3 { margin-top: 0; color: var(--accent); font-size: 1rem; }
+.quiz-options { list-style: none; padding: 0; }
+.quiz-options li {
+  padding: 0.6rem 1rem;
+  margin: 0.4rem 0;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 0.95rem;
+}
+.quiz-options li:hover { border-color: var(--accent); background: var(--accent-light); }
+.quiz-options li.correct {
+  border-color: var(--success);
+  background: var(--success-light);
+  pointer-events: none;
+}
+.quiz-options li.wrong {
+  border-color: var(--error);
+  background: var(--error-light);
+  pointer-events: none;
+  opacity: 0.7;
+}
+.quiz-feedback {
+  margin-top: 0.8rem;
+  padding: 0.6rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: var(--success-light); color: #0d6b3a; }
+.quiz-feedback.wrong { background: var(--error-light); color: #a50e0e; }
+
+/* Navigation */
+.nav-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.nav-links a { font-weight: 600; }
+
+/* Footer */
+.footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: #888;
+}
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease-out; }
+
+/* Print */
+@media print {
+  body { max-width: none; padding: 0; font-size: 11pt; }
+  .quiz-options li { border-color: #999; }
+  .nav-links, .footer { display: none; }
+  pre { border-color: #999; }
+}

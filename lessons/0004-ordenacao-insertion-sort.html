@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 04 — Ordenação, sort() e Insertion Sort</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+
+<span class="lesson-number">Lição 04</span>
+<h1>Ordenação: sort(), Insertion Sort e Estabilidade</h1>
+<p class="subtitle">Como Python ordena, o que é estabilidade, e como funciona o Insertion Sort passo a passo.</p>
+
+<!-- ===== CONCEITO ===== -->
+<h2>🧠 Por Que Ordenar?</h2>
+
+<p>Você já viu na Lição 03: ordenar os dados <strong>permite busca binária</strong>, que é muito mais rápida. Mas ordenação também ajuda em:</p>
+<ul>
+  <li>Busca mais rápida em geral</li>
+  <li>Encontrar mínimo/máximo instantaneamente (primeiro e último elemento)</li>
+  <li>Eliminar duplicatas facilmente</li>
+  <li>Apresentar dados de forma organizada</li>
+</ul>
+
+<!-- ===== SORT EM PYTHON ===== -->
+<h2>💻 <code>sort()</code> e <code>sorted()</code> em Python</h2>
+
+<h3><code>v.sort()</code> — ordena no lugar</h3>
+<pre><code>v = [<span class="num">7</span>, <span class="num">2</span>, <span class="num">9</span>, <span class="num">4</span>, <span class="num">1</span>]
+v.sort()            <span class="cmt"># modifica v diretamente</span>
+<span class="fn">print</span>(v)             <span class="cmt"># [1, 2, 4, 7, 9]</span>
+<span class="fn">print</span>(v[<span class="num">0</span>])          <span class="cmt"># 1  (menor elemento)</span>
+<span class="fn">print</span>(v[<span class="num">-1</span>])         <span class="cmt"># 9  (maior elemento)</span></code></pre>
+
+<div class="callout">
+  <strong>Sobre <code>v[-1]</code></strong>
+  Em Python, índice <strong>negativo</strong> conta de trás pra frente:<br>
+  <code>v[-1]</code> = último elemento, <code>v[-2]</code> = penúltimo.<br>
+  Em Java não existe isso — você faria <code>v[v.length - 1]</code>.
+</div>
+
+<h3><code>sorted()</code> — retorna uma nova lista ordenada</h3>
+<pre><code>v = [<span class="num">7</span>, <span class="num">2</span>, <span class="num">9</span>, <span class="num">4</span>, <span class="num">1</span>]
+nova = <span class="fn">sorted</span>(v)    <span class="cmt"># v continua [7, 2, 9, 4, 1]</span>
+<span class="fn">print</span>(nova)          <span class="cmt"># [1, 2, 4, 7, 9]</span></code></pre>
+
+<div class="callout tip">
+  <strong>💡 sort() vs sorted()</strong>
+  <code>v.sort()</code> → muda a lista original, retorna <code>None</code><br>
+  <code>sorted(v)</code> → cria nova lista, original inalterada<br>
+  Em Java: <code>Collections.sort(lista)</code> é como <code>v.sort()</code> — modifica no lugar.
+</div>
+
+<div class="callout">
+  <strong>Do Kahoot 4: "Você recebe um gerador; o que sorted faz internamente antes de ordenar?"</strong><br>
+  → <strong>Consome inteiro</strong>. <code>sorted()</code> precisa ver TODOS os elementos antes de ordenar, então primeiro transforma o gerador em uma lista completa na memória.
+</div>
+
+<!-- ===== LEN ===== -->
+<h2>📏 <code>len()</code> — Contar Elementos</h2>
+
+<pre><code>v = [<span class="num">2</span>, <span class="num">4</span>, <span class="num">6</span>]
+v.append(<span class="num">8</span>)
+v.append(<span class="num">10</span>)
+<span class="fn">print</span>(<span class="fn">len</span>(v))    <span class="cmt"># 5 (contou: 2, 4, 6, 8, 10)</span></code></pre>
+
+<p><code>len()</code> retorna a quantidade de elementos. Em Java: <code>list.size()</code> ou <code>array.length</code>.</p>
+
+<!-- ===== ESTABILIDADE ===== -->
+<h2>⚖️ Ordenação Estável</h2>
+
+<p>Uma ordenação é <strong>estável</strong> quando elementos com o <strong>mesmo valor mantêm sua ordem relativa original</strong>.</p>
+
+<div class="diagram">
+   Exemplo: ordenar por nota (mantendo ordem de chegada para empates)
+   
+   Original:   [Ana:8, Bia:7, Carlos:8, Dan:7]
+   
+   Estável:    [Bia:7, Dan:7, Ana:8, Carlos:8]
+                ↑ Bia veio antes de Dan → mantém
+                              ↑ Ana veio antes de Carlos → mantém
+   
+   INstável:   [Dan:7, Bia:7, Carlos:8, Ana:8]
+                ↑ Ordem dos empates pode mudar!
+</div>
+
+<div class="callout important">
+  <strong>⚠️ Do Kahoot</strong>
+  "Qual dessas ordenações seria mais estável?" → <strong>"Que mantém iguais juntos"</strong><br>
+  Estável = elementos iguais ficam na mesma ordem relativa em que estavam antes da ordenação.
+</div>
+
+<p>O <code>sort()</code> do Python usa <strong>Timsort</strong>, que é <strong>estável</strong>.</p>
+
+<!-- ===== INSERTION SORT ===== -->
+<h2>🔄 Insertion Sort (Ordenação por Inserção)</h2>
+
+<p>É como organizar cartas na mão: você pega uma carta de cada vez e a insere na posição correta entre as que já estão ordenadas.</p>
+
+<div class="diagram">
+   Ordenando [3, 1, 2] com Insertion Sort:
+   
+   Início:         [3, 1, 2]
+                    ↑ já "ordenado" (só 1 elemento)
+   
+   Passo 1 (i=1):  Pega o 1. Compara com 3.
+                    1 < 3 → troca!     [1, 3, 2]    troca #1
+   
+   Passo 2 (i=2):  Pega o 2. Compara com 3.
+                    2 < 3 → troca!     [1, 2, 3]    troca #2
+                    Compara com 1.
+                    2 > 1 → para!      [1, 2, 3]
+   
+   Total: 2 trocas
+</div>
+
+<h3>Código do Kahoot (Kahoot 3, pergunta 10)</h3>
+<pre><code>v = [<span class="num">3</span>, <span class="num">1</span>, <span class="num">2</span>]
+trocas = <span class="num">0</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="fn">len</span>(v)):   <span class="cmt"># i = 1, 2</span>
+    j = i
+
+    <span class="kw">while</span> j > <span class="num">0</span> <span class="kw">and</span> v[j] < v[j - <span class="num">1</span>]:
+        v[j], v[j - <span class="num">1</span>] = v[j - <span class="num">1</span>], v[j]  <span class="cmt"># troca!</span>
+        trocas += <span class="num">1</span>
+        j -= <span class="num">1</span>
+
+<span class="fn">print</span>(trocas)</code></pre>
+
+<div class="callout">
+  <strong>Sobre <code>v[j], v[j-1] = v[j-1], v[j]</code></strong>
+  Isso é um <strong>swap</strong> em Python — troca dois valores de posição em uma linha.<br>
+  Em Java seria:<br>
+  <code>int temp = v[j]; v[j] = v[j-1]; v[j-1] = temp;</code><br>
+  Python faz em uma linha porque suporta atribuição múltipla.
+</div>
+
+<h3>Rastreando passo a passo:</h3>
+
+<table>
+  <tr><th>i</th><th>j</th><th>Comparação</th><th>Troca?</th><th>Vetor após</th><th>trocas</th></tr>
+  <tr><td>1</td><td>1</td><td>v[1]=1 < v[0]=3?</td><td>Sim</td><td>[1, 3, 2]</td><td>1</td></tr>
+  <tr><td>1</td><td>0</td><td>j > 0? Não → para</td><td>—</td><td>[1, 3, 2]</td><td>1</td></tr>
+  <tr><td>2</td><td>2</td><td>v[2]=2 < v[1]=3?</td><td>Sim</td><td>[1, 2, 3]</td><td>2</td></tr>
+  <tr><td>2</td><td>1</td><td>v[1]=2 < v[0]=1?</td><td>Não → para</td><td>[1, 2, 3]</td><td>2</td></tr>
+</table>
+
+<p><strong>Resultado: 2 trocas.</strong></p>
+
+<div class="callout warn">
+  <strong>⚠️ Atenção</strong>
+  O Kahoot diz que a resposta é 9, mas pelo rastreamento correto de <code>[3, 1, 2]</code>, são <strong>2 trocas</strong>. É possível que o código no Kahoot tenha indentação diferente ou que a resposta original esteja errada. O importante é que você saiba <strong>rastrear a execução</strong> — é isso que cai na prova.
+</div>
+
+<!-- ===== QUIZ ===== -->
+<h2>🎯 Teste Seu Conhecimento</h2>
+
+<div class="quiz" data-quiz="q1">
+  <h3>1. Qual é a saída?</h3>
+  <pre><code>v = [7, 2, 9, 4, 1]
+v.sort()
+print(v[0])</code></pre>
+  <ul class="quiz-options">
+    <li data-correct>1</li>
+    <li>7</li>
+    <li>9</li>
+    <li>2</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! sort() ordena para [1, 2, 4, 7, 9]. v[0] é o primeiro = 1 (menor).</div>
+  <div class="quiz-feedback wrong">❌ sort() ordena crescente: [1, 2, 4, 7, 9]. v[0] = primeiro elemento = 1.</div>
+</div>
+
+<div class="quiz" data-quiz="q2">
+  <h3>2. Qual é a saída?</h3>
+  <pre><code>v = [7, 2, 9, 4, 1]
+v.sort()
+print(v[-1])</code></pre>
+  <ul class="quiz-options">
+    <li data-correct>9</li>
+    <li>1</li>
+    <li>7</li>
+    <li>4</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Perfeito! Após sort: [1, 2, 4, 7, 9]. v[-1] = último = 9 (maior).</div>
+  <div class="quiz-feedback wrong">❌ sort() → [1, 2, 4, 7, 9]. v[-1] é o ÚLTIMO elemento = 9.</div>
+</div>
+
+<div class="quiz" data-quiz="q3">
+  <h3>3. O que torna uma ordenação "estável"?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Mantém iguais juntos</li>
+    <li>Ordena mais rápido</li>
+    <li>Usa menos memória</li>
+    <li>Nunca falha</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Exato! Estável = elementos com mesmo valor mantêm a ordem relativa original.</div>
+  <div class="quiz-feedback wrong">❌ Estável = quando dois elementos são iguais, eles ficam na mesma ordem em que estavam antes.</div>
+</div>
+
+<div class="quiz" data-quiz="q4">
+  <h3>4. Qual é a saída?</h3>
+  <pre><code>v = [2, 4, 6]
+v.append(8)
+v.append(10)
+print(len(v))</code></pre>
+  <ul class="quiz-options">
+    <li data-correct>5</li>
+    <li>3</li>
+    <li>10</li>
+    <li>6</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! Começou com 3 elementos, adicionou 2 → total = 5.</div>
+  <div class="quiz-feedback wrong">❌ v começa com [2,4,6] (3 itens), append adiciona 2 mais → len = 5.</div>
+</div>
+
+<div class="quiz" data-quiz="q5">
+  <h3>5. Qual efeito da ordenação em pesquisa de dados?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Busca mais rápida</li>
+    <li>Busca mais lenta</li>
+    <li>Mesma velocidade</li>
+    <li>Não tem efeito</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Sim! Ordenar permite busca binária, que é muito mais rápida que linear.</div>
+  <div class="quiz-feedback wrong">❌ Dados ordenados permitem busca binária → busca mais rápida!</div>
+</div>
+
+<!-- ===== RESUMO ===== -->
+<h2>📋 Resumo Rápido</h2>
+<table>
+  <tr><th>Conceito</th><th>O que lembrar</th></tr>
+  <tr><td><code>v.sort()</code></td><td>Ordena no lugar, crescente</td></tr>
+  <tr><td><code>sorted(v)</code></td><td>Retorna nova lista, consome gerador inteiro</td></tr>
+  <tr><td><code>v[-1]</code></td><td>Último elemento (maior, se ordenado)</td></tr>
+  <tr><td><code>len(v)</code></td><td>Quantidade de elementos</td></tr>
+  <tr><td>Estável</td><td>Iguais mantêm ordem original</td></tr>
+  <tr><td>Insertion Sort</td><td>Pega um por um, insere na posição certa</td></tr>
+  <tr><td>Swap em Python</td><td><code>a, b = b, a</code></td></tr>
+</table>
+
+<!-- ===== LEITURA ===== -->
+<h2>📚 Leitura Recomendada</h2>
+<p>
+  <a href="https://docs.python.org/pt-br/3/howto/sorting.html" target="_blank">
+    📖 Docs Python (PT-BR): Sorting HOW TO
+  </a> — Guia oficial sobre ordenação em Python.
+</p>
+
+<div class="callout tip">
+  <strong>🤖 Ficou com dúvida?</strong>
+  Insertion Sort parece simples, mas rastrear as trocas requer atenção. Se quiser, me manda um vetor e a gente rastreia junto, passo a passo!
+</div>
+
+<!-- ===== NAV ===== -->
+<div class="nav-links">
+  <a href="0003-busca-linear-binaria.html">← Lição 03: Busca</a>
+  <a href="0005-bibliotecas-heapq-bisect-join.html">Lição 05: Bibliotecas Python →</a>
+</div>
+
+<div class="footer">
+  Algoritmos e Estrutura de Dados — CEUB 4º Semestre — Estudo para Prova 1
+</div>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

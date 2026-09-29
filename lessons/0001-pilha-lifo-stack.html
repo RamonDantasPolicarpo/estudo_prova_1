@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 01 — Pilha (Stack): LIFO</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+
+<span class="lesson-number">Lição 01</span>
+<h1>Pilha (Stack): Último a Entrar, Primeiro a Sair</h1>
+<p class="subtitle">O conceito mais fundamental de estrutura de dados — e como Python implementa com listas.</p>
+
+<!-- ===== CONCEITO ===== -->
+<h2>🧠 O Conceito</h2>
+
+<p>Uma <strong>pilha</strong> é uma estrutura de dados onde o <strong>último</strong> elemento inserido é o <strong>primeiro</strong> a ser removido. Isso se chama <strong>LIFO</strong> — <em>Last In, First Out</em>.</p>
+
+<div class="callout">
+  <strong>Analogia do mundo real</strong>
+  Pense em uma pilha de pratos. Você coloca um prato em cima do outro. Quando vai pegar um, pega sempre o de cima — o último que colocou.
+</div>
+
+<p>As duas operações fundamentais são:</p>
+<table>
+  <tr><th>Operação</th><th>O que faz</th><th>Em Python (list)</th><th>Em Java (Stack)</th></tr>
+  <tr><td><strong>Push</strong> (empilhar)</td><td>Coloca no topo</td><td><code>pilha.append(x)</code></td><td><code>stack.push(x)</code></td></tr>
+  <tr><td><strong>Pop</strong> (desempilhar)</td><td>Remove do topo e retorna</td><td><code>pilha.pop()</code></td><td><code>stack.pop()</code></td></tr>
+</table>
+
+<div class="callout java">
+  <strong>🔶 Conexão com Java</strong>
+  Em Java você usa <code>Stack&lt;Integer&gt;</code> com <code>push()</code> e <code>pop()</code>. Em Python, uma <code>list</code> simples faz o mesmo papel — <code>append()</code> é o push, <code>pop()</code> é o pop. O nome muda, o conceito é idêntico.
+</div>
+
+<!-- ===== VISUAL ===== -->
+<h2>👁️ Visualizando</h2>
+
+<div class="diagram">
+    append(10)    append(20)    append(30)      pop()
+                                             
+   ┌──────┐     ┌──────┐     ┌──────┐       ┌──────┐
+             │      │     │      │     │  30  │ ←topo │      │  → retorna 30
+         │      │     │  20  │     │  20  │       │  20  │ ←topo
+   │  10  │     │  10  │     │  10  │       │  10  │
+   └──────┘     └──────┘     └──────┘       └──────┘
+   
+   pilha=[10]  pilha=[10,20] pilha=[10,20,30] pilha=[10,20]
+</div>
+
+<p>O <code>pop()</code> <strong>sempre remove o último</strong> elemento da lista — que é o topo da pilha.</p>
+
+<!-- ===== CÓDIGO ===== -->
+<h2>💻 Sintaxe Python Essencial</h2>
+
+<h3>Criando e manipulando uma pilha</h3>
+<pre><code><span class="cmt"># Criar pilha vazia</span>
+pilha = []
+
+<span class="cmt"># Empilhar (push)</span>
+pilha.append(<span class="num">10</span>)   <span class="cmt"># pilha = [10]</span>
+pilha.append(<span class="num">20</span>)   <span class="cmt"># pilha = [10, 20]</span>
+pilha.append(<span class="num">30</span>)   <span class="cmt"># pilha = [10, 20, 30]</span>
+
+<span class="cmt"># Desempilhar (pop) — remove E retorna o topo</span>
+topo = pilha.pop()  <span class="cmt"># topo = 30, pilha = [10, 20]</span>
+<span class="fn">print</span>(topo)          <span class="cmt"># Saída: 30</span></code></pre>
+
+<h3>Invertendo com pilha</h3>
+<pre><code>texto = <span class="str">"DADOS"</span>
+pilha = []
+
+<span class="cmt"># Empilha cada letra: D, A, D, O, S</span>
+<span class="kw">for</span> letra <span class="kw">in</span> texto:
+    pilha.append(letra)
+
+<span class="cmt"># Desempilha: S, O, D, A, D (invertido!)</span>
+invertido = <span class="str">""</span>
+<span class="kw">while</span> pilha:           <span class="cmt"># enquanto pilha NÃO estiver vazia</span>
+    invertido += pilha.pop()
+
+<span class="fn">print</span>(invertido)       <span class="cmt"># Saída: SODAD</span></code></pre>
+
+<div class="callout tip">
+  <strong>💡 Dica de sintaxe</strong>
+  <code>while pilha:</code> em Python significa "enquanto a lista não estiver vazia". Uma lista vazia <code>[]</code> é considerada <code>False</code>. Em Java seria <code>while (!stack.isEmpty())</code>.
+</div>
+
+<h3>O que <code>range(1, 5)</code> gera?</h3>
+<pre><code><span class="cmt"># range(1, 5) gera: 1, 2, 3, 4  (NÃO inclui o 5!)</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">5</span>):
+    pilha.append(i)
+<span class="cmt"># pilha = [1, 2, 3, 4]</span>
+
+<span class="cmt"># Desempilhar tudo imprime na ordem inversa</span>
+<span class="kw">while</span> pilha:
+    <span class="fn">print</span>(pilha.pop(), end=<span class="str">" "</span>)
+<span class="cmt"># Saída: 4 3 2 1</span></code></pre>
+
+<div class="callout">
+  <strong>Sobre <code>end=" "</code></strong>
+  Em Python, <code>print()</code> por padrão pula linha. <code>end=" "</code> troca a quebra de linha por um espaço, então tudo fica na mesma linha: <code>4 3 2 1</code>.
+</div>
+
+<!-- ===== APLICAÇÕES ===== -->
+<h2>🌍 Onde Pilha Aparece no Mundo Real</h2>
+
+<ul>
+  <li><strong>Ctrl+Z (Desfazer):</strong> cada ação é empilhada; desfazer faz pop da última ação</li>
+  <li><strong>Parênteses balanceados:</strong> ao ler <code>(</code> empilha; ao ler <code>)</code> desempilha. Se no final a pilha estiver vazia, está balanceado</li>
+  <li><strong>Recursão:</strong> cada chamada de função é um "frame" empilhado na <em>call stack</em> da máquina</li>
+  <li><strong>Notação pós-fixa:</strong> calculadoras HP usam pilha — empilha operandos, operador faz pop de dois e empilha o resultado</li>
+</ul>
+
+<!-- ===== PILHA EM VETOR VS LIGADA ===== -->
+<h2>📦 Pilha em Vetor vs Pilha Ligada</h2>
+
+<table>
+  <tr><th>Aspecto</th><th>Vetor (array/list)</th><th>Ligada (linked list)</th></tr>
+  <tr><td>Limite de tamanho</td><td><strong>Estático</strong> — pode estourar se o vetor encher</td><td>Dinâmico — cresce conforme necessário</td></tr>
+  <tr><td>Contador de tamanho</td><td>Usa <code>len()</code></td><td>Pode ter contador para <strong>check rápido</strong></td></tr>
+  <tr><td>Memória</td><td>Contígua</td><td>Espalhada (cada nó aponta pro próximo)</td></tr>
+</table>
+
+<div class="callout important">
+  <strong>⚠️ Do Kahoot</strong>
+  "Por que pilha em vetor pode estourar mais cedo?" → Porque tem <strong>limite estático</strong> (tamanho fixo do array). Em Python a list cresce automaticamente, mas conceitualmente a resposta é essa.
+</div>
+
+<!-- ===== QUIZ ===== -->
+<h2>🎯 Teste Seu Conhecimento</h2>
+
+<div class="quiz" data-quiz="q1">
+  <h3>1. Qual dessas estruturas é LIFO?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Pilha</li>
+    <li>Fila</li>
+    <li>Lista encadeada</li>
+    <li>Árvore binária</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! Pilha = LIFO (Last In, First Out). Sempre remove o último elemento inserido.</div>
+  <div class="quiz-feedback wrong">❌ LIFO = Last In, First Out. Isso é a Pilha! Fila é FIFO.</div>
+</div>
+
+<div class="quiz" data-quiz="q2">
+  <h3>2. Qual é a saída deste código?</h3>
+  <pre><code>pilha = [5, 10, 15, 20]
+pilha.pop()
+pilha.pop()
+print(pilha)</code></pre>
+  <ul class="quiz-options">
+    <li data-correct>[5, 10]</li>
+    <li>[15, 20]</li>
+    <li>[5, 10, 15]</li>
+    <li>[10, 15, 20]</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! O primeiro pop() remove 20, o segundo remove 15. Sobram [5, 10].</div>
+  <div class="quiz-feedback wrong">❌ pop() remove do FINAL da lista (topo da pilha). Primeiro sai 20, depois 15. Sobra [5, 10].</div>
+</div>
+
+<div class="quiz" data-quiz="q3">
+  <h3>3. Qual código inverte a string "DADOS" usando pilha?</h3>
+  <pre><code>texto = "DADOS"
+pilha = []
+for letra in texto:
+    pilha.append(letra)
+# O que pilha.pop() vai retornando?</code></pre>
+  <ul class="quiz-options">
+    <li data-correct>S, O, D, A, D</li>
+    <li>D, A, D, O, S</li>
+    <li>S, A, D, O, D</li>
+    <li>D, O, D, A, S</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Perfeito! A última letra empilhada foi "S", então é a primeira a sair. Resultado: SODAD.</div>
+  <div class="quiz-feedback wrong">❌ Lembre: LIFO! O último empilhado ("S") sai primeiro. A ordem de saída é S→O→D→A→D.</div>
+</div>
+
+<div class="quiz" data-quiz="q4">
+  <h3>4. Como a pilha é usada para desfazer ações (Ctrl+Z)?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Última ação primeiro</li>
+    <li>Primeira ação primeiro</li>
+    <li>Ação aleatória</li>
+    <li>Todas ações juntas</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Exato! Ctrl+Z desfaz a ÚLTIMA ação — comportamento LIFO da pilha.</div>
+  <div class="quiz-feedback wrong">❌ Desfazer = pop da pilha de ações. A última ação feita é a primeira a ser desfeita (LIFO).</div>
+</div>
+
+<div class="quiz" data-quiz="q5">
+  <h3>5. O que a pilha da máquina guarda durante execução recursiva?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Frames de chamada</li>
+    <li>Valores de retorno</li>
+    <li>Endereços de memória</li>
+    <li>Variáveis globais</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! Cada chamada recursiva cria um "frame" na call stack com variáveis locais e endereço de retorno.</div>
+  <div class="quiz-feedback wrong">❌ A pilha de execução guarda "frames de chamada" — cada frame tem as variáveis locais e o ponto de retorno daquela chamada.</div>
+</div>
+
+<div class="quiz" data-quiz="q6">
+  <h3>6. Este código usa que estrutura?</h3>
+  <pre><code>estrutura = []
+estrutura.append("A")
+estrutura.append("B")
+estrutura.append("C")
+print(estrutura.pop())</code></pre>
+  <ul class="quiz-options">
+    <li data-correct>Pilha (LIFO)</li>
+    <li>Fila (FIFO)</li>
+    <li>Deque</li>
+    <li>Lista ordenada</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Sim! append() + pop() = comportamento de Pilha (LIFO). Imprime "C" — o último inserido.</div>
+  <div class="quiz-feedback wrong">❌ append() no final + pop() no final = só mexe numa ponta = LIFO = Pilha!</div>
+</div>
+
+<!-- ===== RESUMO ===== -->
+<h2>📋 Resumo Rápido</h2>
+<table>
+  <tr><th>Item</th><th>Lembre-se</th></tr>
+  <tr><td>Tipo</td><td><strong>LIFO</strong> — Last In, First Out</td></tr>
+  <tr><td>Python</td><td><code>list</code> com <code>append()</code> e <code>pop()</code></td></tr>
+  <tr><td>Java</td><td><code>Stack</code> com <code>push()</code> e <code>pop()</code></td></tr>
+  <tr><td>Usos</td><td>Desfazer, recursão, parênteses, pós-fixa, inverter</td></tr>
+  <tr><td>Vetor vs Ligada</td><td>Vetor tem limite estático; ligada é dinâmica</td></tr>
+</table>
+
+<!-- ===== LEITURA ===== -->
+<h2>📚 Leitura Recomendada</h2>
+<p>
+  <a href="https://docs.python.org/pt-br/3/tutorial/datastructures.html#using-lists-as-stacks" target="_blank">
+    📖 Docs Python (PT-BR): Usando Listas como Pilhas
+  </a> — Documentação oficial, direto ao ponto.
+</p>
+
+<!-- ===== FOLLOW-UP ===== -->
+<div class="callout tip">
+  <strong>🤖 Ficou com dúvida?</strong>
+  Pergunte ao Antigravity! Estou aqui para explicar qualquer conceito que não ficou claro. Não tenha vergonha — perguntar é como se faz <code>push</code> de conhecimento na sua pilha mental. 😄
+</div>
+
+<!-- ===== NAV ===== -->
+<div class="nav-links">
+  <span>← Início</span>
+  <a href="0002-fila-fifo-deque.html">Lição 02: Fila (FIFO) →</a>
+</div>
+
+<div class="footer">
+  Algoritmos e Estrutura de Dados — CEUB 4º Semestre — Estudo para Prova 1
+</div>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição 03 — Busca Linear vs Busca Binária</title>
+  <link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+
+<span class="lesson-number">Lição 03</span>
+<h1>Busca: Linear vs Binária</h1>
+<p class="subtitle">Quando cada uma é melhor, por que ordenar antes, e como o meio do intervalo funciona.</p>
+
+<!-- ===== BUSCA LINEAR ===== -->
+<h2>🔍 Busca Linear (Sequencial)</h2>
+
+<p>A busca mais simples: percorre <strong>um por um</strong>, do início ao fim, até achar o elemento ou acabar a lista.</p>
+
+<div class="diagram">
+   Procurando o 40 em [10, 30, 40, 20, 50]:
+
+   [10] → não    [30] → não    [40] → ACHOU!
+    ↑              ↑              ↑
+   1ª check       2ª check       3ª check
+   
+   Precisou de 3 comparações.
+</div>
+
+<p><strong>Vantagens:</strong></p>
+<ul>
+  <li>Funciona em <strong>qualquer lista</strong> — ordenada ou não</li>
+  <li>Simples de implementar</li>
+  <li>Melhor quando tem <strong>poucos elementos</strong></li>
+</ul>
+
+<p><strong>Desvantagem:</strong> no pior caso, verifica <em>todos</em> os elementos. Com 1 milhão de itens, pode precisar de 1 milhão de comparações.</p>
+
+<!-- ===== BUSCA BINÁRIA ===== -->
+<h2>⚡ Busca Binária</h2>
+
+<p>A busca binária é muito mais rápida, mas tem um <strong>pré-requisito obrigatório</strong>: a lista <strong>precisa estar ordenada</strong>.</p>
+
+<div class="callout important">
+  <strong>⚠️ Regra de Ouro</strong>
+  Busca binária <strong>só funciona em vetor ordenado</strong>. Sempre. Sem exceção.<br>
+  É por isso que "ordenar antes de buscar permite busca binária" (Kahoot 1, pergunta 3).
+</div>
+
+<h3>Como funciona: dividir o problema pela metade</h3>
+
+<p>A ideia central é: olhe para o <strong>meio</strong> do intervalo. Se o alvo é maior, descarte a metade esquerda. Se é menor, descarte a metade direita. Repita.</p>
+
+<div class="diagram">
+   Procurando 25 em [5, 10, 15, 20, 25, 30, 35]:
+   
+   Passo 1:  inicio=0, fim=6
+             meio = (0+6)//2 = 3
+             vetor[3] = 20
+             20 < 25 → descarta esquerda → inicio = meio+1 = 4
+   
+             [5, 10, 15, 20, 25, 30, 35]
+                              ↑meio
+              ─descartado─     ───busca aqui───
+   
+   Passo 2:  inicio=4, fim=6
+             meio = (4+6)//2 = 5
+             vetor[5] = 30
+             30 > 25 → descarta direita → fim = meio-1 = 4
+   
+   Passo 3:  inicio=4, fim=4
+             meio = (4+4)//2 = 4
+             vetor[4] = 25
+             25 == 25 → ENCONTRADO! índice 4
+</div>
+
+<p>Em vez de 7 comparações (linear), usou apenas <strong>3</strong>. Com 1 milhão de itens, precisa de no máximo ~20 comparações!</p>
+
+<!-- ===== CÓDIGO ===== -->
+<h2>💻 Código Python: Passo a Passo</h2>
+
+<h3>Encontrando o meio do vetor</h3>
+<pre><code>vetor = [<span class="num">2</span>, <span class="num">4</span>, <span class="num">6</span>, <span class="num">8</span>, <span class="num">10</span>, <span class="num">12</span>, <span class="num">14</span>]
+
+inicio = <span class="num">0</span>
+fim = <span class="fn">len</span>(vetor) - <span class="num">1</span>   <span class="cmt"># 6 (último índice)</span>
+meio = (inicio + fim) // <span class="num">2</span>  <span class="cmt"># (0+6)//2 = 3</span>
+
+<span class="fn">print</span>(vetor[meio])           <span class="cmt"># Saída: 8 (o elemento do meio)</span></code></pre>
+
+<div class="callout">
+  <strong>Sobre o <code>//</code></strong>
+  <code>//</code> é divisão inteira em Python — divide e descarta a parte decimal.<br>
+  <code>7 // 2 = 3</code> (não 3.5)<br>
+  Em Java seria a divisão normal de <code>int</code>: <code>7 / 2 = 3</code>.
+</div>
+
+<h3>Verificando se o meio é o alvo</h3>
+<pre><code>vetor = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>, <span class="num">60</span>, <span class="num">70</span>]
+
+inicio = <span class="num">0</span>
+fim = <span class="fn">len</span>(vetor) - <span class="num">1</span>         <span class="cmt"># 6</span>
+meio = (inicio + fim) // <span class="num">2</span>    <span class="cmt"># 3</span>
+
+<span class="kw">if</span> vetor[meio] == <span class="num">40</span>:
+    <span class="fn">print</span>(<span class="str">"Encontrado"</span>)       <span class="cmt"># ← isso executa!</span>
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"Não encontrado"</span>)
+
+<span class="cmt"># vetor[3] = 40, que é igual a 40 → "Encontrado"</span></code></pre>
+
+<h3>Quando o alvo NÃO está no meio: ajustar o intervalo</h3>
+<pre><code>vetor = [<span class="num">5</span>, <span class="num">10</span>, <span class="num">15</span>, <span class="num">20</span>, <span class="num">25</span>, <span class="num">30</span>, <span class="num">35</span>]
+<span class="cmt"># Procurando o 25</span>
+
+inicio = <span class="num">0</span>
+fim = <span class="num">6</span>
+meio = (inicio + fim) // <span class="num">2</span>   <span class="cmt"># 3</span>
+
+<span class="cmt"># vetor[3] = 20, que é < 25</span>
+<span class="cmt"># Então o 25 está na DIREITA → mover inicio para frente</span>
+<span class="kw">if</span> vetor[meio] &lt; <span class="num">25</span>:
+    inicio = meio + <span class="num">1</span>        <span class="cmt"># inicio = 4</span>
+
+<span class="fn">print</span>(inicio)                 <span class="cmt"># Saída: 4</span></code></pre>
+
+<div class="callout java">
+  <strong>🔶 Conexão com Java</strong>
+  A lógica é idêntica em qualquer linguagem:<br>
+  <code>int meio = (inicio + fim) / 2;</code><br>
+  <code>if (vetor[meio] < alvo) inicio = meio + 1;</code><br>
+  <code>else if (vetor[meio] > alvo) fim = meio - 1;</code><br>
+  Python só troca <code>/</code> por <code>//</code> para divisão inteira.
+</div>
+
+<!-- ===== COMPARAÇÃO ===== -->
+<h2>⚖️ Quando Usar Cada Uma</h2>
+
+<table>
+  <tr><th>Situação</th><th>Melhor busca</th><th>Por quê</th></tr>
+  <tr><td>Lista desordenada</td><td><strong>Linear</strong></td><td>Binária não funciona sem ordem</td></tr>
+  <tr><td>Lista ordenada, muitos elementos</td><td><strong>Binária</strong></td><td>Menos comparações (divide pela metade)</td></tr>
+  <tr><td>Poucos elementos</td><td><strong>Linear</strong></td><td>Overhead da binária não compensa</td></tr>
+  <tr><td>Vetor ordenado</td><td><strong>Binária</strong></td><td>Sempre melhor em vetor ordenado</td></tr>
+</table>
+
+<div class="callout tip">
+  <strong>💡 Resumo em uma frase</strong>
+  Ordenar os dados <strong>permite</strong> busca binária, que é mais rápida que linear porque faz <strong>menos comparações</strong> — divide o problema pela metade a cada passo.
+</div>
+
+<!-- ===== VIZINHOS ===== -->
+<h2>🔢 Quantos Vizinhos São Checados?</h2>
+
+<p>Na busca binária, a cada passo você compara o elemento do meio com o alvo e decide ir para <strong>esquerda ou direita</strong>. No máximo, <strong>2 vizinhos</strong> são checados em cada nível de decisão (o meio e o próximo meio após o ajuste).</p>
+
+<div class="callout">
+  <strong>Do Kahoot</strong>
+  "Quantos vizinhos máximos são checados em uma busca binária?" → <strong>2</strong>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<h2>🎯 Teste Seu Conhecimento</h2>
+
+<div class="quiz" data-quiz="q1">
+  <h3>1. Quando a busca binária é melhor?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Vetor ordenado</li>
+    <li>Vetor desordenado</li>
+    <li>Lista vazia</li>
+    <li>Lista encadeada</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! Busca binária exige vetor ordenado — é o pré-requisito fundamental.</div>
+  <div class="quiz-feedback wrong">❌ Busca binária SÓ funciona em vetor ordenado. Sem ordem, não dá pra dividir pela metade.</div>
+</div>
+
+<div class="quiz" data-quiz="q2">
+  <h3>2. Qual a saída?</h3>
+  <pre><code>vetor = [2, 4, 6, 8, 10, 12, 14]
+inicio = 0
+fim = len(vetor) - 1
+meio = (inicio + fim) // 2
+print(vetor[meio])</code></pre>
+  <ul class="quiz-options">
+    <li data-correct>8</li>
+    <li>6</li>
+    <li>10</li>
+    <li>4</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Perfeito! fim=6, meio=(0+6)//2=3, vetor[3]=8.</div>
+  <div class="quiz-feedback wrong">❌ len=7, fim=6, meio=(0+6)//2=3. O elemento no índice 3 é 8 (contando: 2[0], 4[1], 6[2], 8[3]).</div>
+</div>
+
+<div class="quiz" data-quiz="q3">
+  <h3>3. Por que ordenar antes de buscar?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Permite busca binária</li>
+    <li>Economiza memória</li>
+    <li>Facilita inserção</li>
+    <li>Reduz o vetor</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Exato! Ordenar é o que habilita o uso de busca binária, que é muito mais eficiente.</div>
+  <div class="quiz-feedback wrong">❌ A razão principal é permitir busca binária — que divide o problema pela metade a cada passo.</div>
+</div>
+
+<div class="quiz" data-quiz="q4">
+  <h3>4. Qual a vantagem da busca binária sobre a linear?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Menos comparações</li>
+    <li>Menos memória</li>
+    <li>Mais simples</li>
+    <li>Funciona sempre</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Sim! Binária faz muito menos comparações porque divide pela metade a cada passo.</div>
+  <div class="quiz-feedback wrong">❌ A vantagem é fazer menos comparações. Ex: em 1 milhão de itens, linear pode precisar de 1M, binária precisa de ~20.</div>
+</div>
+
+<div class="quiz" data-quiz="q5">
+  <h3>5. Quando a busca linear pode ser melhor que a binária?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Poucos elementos</li>
+    <li>Muitos elementos</li>
+    <li>Dados ordenados</li>
+    <li>Dados repetidos</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Correto! Com poucos elementos, o overhead da binária não compensa — linear é mais direta.</div>
+  <div class="quiz-feedback wrong">❌ Com poucos elementos, a busca linear é mais simples e rápida na prática — a binária tem overhead desnecessário.</div>
+</div>
+
+<div class="quiz" data-quiz="q6">
+  <h3>6. Por que a busca binária usa o meio do intervalo?</h3>
+  <ul class="quiz-options">
+    <li data-correct>Divide problema</li>
+    <li>Encontra mínimo</li>
+    <li>Ordena dados</li>
+    <li>Compara vizinhos</li>
+  </ul>
+  <div class="quiz-feedback correct">✅ Perfeito! Olhar o meio divide o problema pela metade — isso é a essência do "dividir e conquistar".</div>
+  <div class="quiz-feedback wrong">❌ O meio divide o problema pela metade — descarta 50% dos dados a cada passo.</div>
+</div>
+
+<!-- ===== RESUMO ===== -->
+<h2>📋 Resumo Rápido</h2>
+<table>
+  <tr><th>Aspecto</th><th>Busca Linear</th><th>Busca Binária</th></tr>
+  <tr><td>Pré-requisito</td><td>Nenhum</td><td><strong>Lista ordenada</strong></td></tr>
+  <tr><td>Estratégia</td><td>Um por um</td><td>Divide pela metade</td></tr>
+  <tr><td>Comparações</td><td>Até N</td><td>Até log₂(N)</td></tr>
+  <tr><td>Melhor para</td><td>Poucos elementos</td><td>Muitos elementos ordenados</td></tr>
+  <tr><td>Fórmula do meio</td><td>—</td><td><code>(inicio+fim)//2</code></td></tr>
+</table>
+
+<!-- ===== LEITURA ===== -->
+<h2>📚 Leitura Recomendada</h2>
+<p>
+  <a href="https://docs.python.org/3/library/bisect.html" target="_blank">
+    📖 Docs Python: bisect — Array bisection algorithm
+  </a> — O módulo que implementa busca binária pronta em Python.
+</p>
+
+<!-- ===== FOLLOW-UP ===== -->
+<div class="callout tip">
+  <strong>🤖 Ficou com dúvida?</strong>
+  A busca binária é o algoritmo mais perguntado em provas. Se a conta do <code>meio = (inicio + fim) // 2</code> não ficou clara, me pergunta — vamos fazer na mão juntos!
+</div>
+
+<!-- ===== NAV ===== -->
+<div class="nav-links">
+  <a href="0002-fila-fifo-deque.html">← Lição 02: Fila (FIFO)</a>
+  <a href="0004-ordenacao-insertion-sort.html">Lição 04: Ordenação →</a>
+</div>
+
+<div class="footer">
+  Algoritmos e Estrutura de Dados — CEUB 4º Semestre — Estudo para Prova 1
+</div>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>
