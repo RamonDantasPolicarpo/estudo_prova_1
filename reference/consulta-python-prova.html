@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consulta rápida — Python para a prova prática</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  body{font-family:Georgia,serif;max-width:860px;margin:0 auto;padding:20px;line-height:1.5;color:#222}
+  h1{margin-bottom:0} h2{border-bottom:2px solid #333;padding-bottom:4px;margin-top:32px}
+  pre{background:#f4f4f4;border-left:4px solid #3b82f6;padding:10px;overflow-x:auto;font-size:14px}
+  code{font-family:Consolas,monospace}
+  table{border-collapse:collapse;width:100%;font-size:14px} td,th{border:1px solid #bbb;padding:5px 8px;text-align:left}
+  th{background:#eee}
+  .erro{background:#fff1f1;border-left:4px solid #dc2626;padding:8px 12px;margin:10px 0}
+  .ok{background:#effaf1;border-left:4px solid #16a34a;padding:8px 12px;margin:10px 0}
+  .tip{background:#fff9e6;border-left:4px solid #f59e0b;padding:8px 12px;margin:10px 0}
+  @media print{pre{font-size:11px} h2{page-break-after:avoid} .quebra{page-break-before:always}}
+</style>
+</head>
+<body>
+
+<h1>Consulta rápida: Python para a prova</h1>
+<p><em>Só o que apareceu nos Kahoots + os moldes de leitura dos problemas. Quem vem do Java: tudo comparado.</em></p>
+
+<div class="erro">
+<strong>⚠️ Os seus 5 tropeços (é aqui que você erra, confira SEMPRE):</strong>
+<ol>
+<li><strong><code>len</code> é função, não método.</strong> ❌ <code>pilha.len()</code> ❌ <code>pilha.len</code> → ✅ <code>len(pilha)</code></li>
+<li><strong><code>break</code> solto dentro do <code>for</code></strong> encerra o laço na 1ª volta. Só use <code>break</code> quando <em>quiser mesmo</em> parar.</li>
+<li><strong><code>pop()</code> em lista vazia dá erro.</strong> Sempre cheque antes: <code>if pilha:</code> (tem algo) ou <code>if not pilha:</code> (vazia).</li>
+<li><strong><code>input()</code> devolve TEXTO.</strong> Para número: <code>int(input())</code>.</li>
+<li><strong><code>join</code> só junta textos.</strong> Número precisa de <code>str(x)</code> antes. E <code>print(lista)</code> mostra os <code>[ ]</code>; para tirar, use <code>join</code>.</li>
+</ol>
+</div>
+
+<h2>1. Java → Python</h2>
+<table>
+<tr><th>Java</th><th>Python</th></tr>
+<tr><td><code>{ }</code> blocos</td><td>indentação + <code>:</code> no fim da linha</td></tr>
+<tr><td><code>int x = 5;</code></td><td><code>x = 5</code></td></tr>
+<tr><td><code>v.add(x)</code> / <code>v.size()</code></td><td><code>v.append(x)</code> / <code>len(v)</code></td></tr>
+<tr><td><code>for(int i=1;i&lt;5;i++)</code></td><td><code>for i in range(1, 5):</code> (1 a 4; o fim NÃO entra)</td></tr>
+<tr><td><code>&amp;&amp;  ||  !</code></td><td><code>and  or  not</code></td></tr>
+<tr><td><code>else if</code></td><td><code>elif</code></td></tr>
+<tr><td><code>Integer.parseInt(s)</code></td><td><code>int(s)</code></td></tr>
+<tr><td><code>String.valueOf(n)</code></td><td><code>str(n)</code></td></tr>
+<tr><td><code>a / b</code> (inteiros)</td><td><code>a // b</code> (divisão inteira)</td></tr>
+</table>
+
+<h2>2. Lista (vetor)</h2>
+<pre>v = [7, 2, 9]
+v.append(8)     # põe no FIM          [7, 2, 9, 8]
+v.pop()         # tira do FIM (8)
+v[0]            # primeiro (7)
+v[-1]           # ÚLTIMO (9)
+len(v)          # tamanho
+v.sort()        # ordena a lista (crescente)</pre>
+
+<h2>3. Pilha (LIFO) — "pilha de pratos"</h2>
+<p>Último que entra = primeiro que sai. Lista com <code>append</code> + <code>pop</code>.</p>
+<pre>pilha = []
+pilha.append(10)
+pilha.append(20)
+pilha.append(30)
+print(pilha.pop())        # 30
+print(pilha)              # [10, 20]
+
+while pilha:              # enquanto NÃO estiver vazia
+    print(pilha.pop(), end=" ")   # end=" " não pula linha</pre>
+
+<h3>Molde dos parênteses (1068 / 1069 / 1242)</h3>
+<div class="ok">Abre → <code>append</code>. Fecha → confere se tem algo, depois <code>pop</code>. No fim, se sobrou algo, está errado.</div>
+<pre>pilha = []
+correto = True
+for c in expressao:
+    if c == "(":
+        pilha.append(1)
+    elif c == ")":
+        if len(pilha) == 0:      # fechou sem abrir
+            correto = False
+        else:
+            pilha.pop()
+if len(pilha) > 0:               # abriu e não fechou
+    correto = False
+print("correct" if correto else "incorrect")</pre>
+<p><strong>1069 (diamantes):</strong> <code>&lt;</code> empilha; <code>&gt;</code> com pilha não vazia → <code>pop</code> e <code>diamantes += 1</code>. Areia <code>.</code> é ignorada.</p>
+
+<h2 class="quebra">4. Fila (FIFO) — "fila do banco"</h2>
+<p>Primeiro que entra = primeiro que sai. <strong><code>deque</code></strong> com <code>append</code> + <code>popleft</code>. <em>Nunca</em> <code>lista.pop(0)</code> (lento: tem que deslocar todos).</p>
+<pre>from collections import deque     # NÃO esqueça o import!
+
+fila = deque()                    # ou deque([10, 20, 30])
+fila.append(10)                   # entra no FIM
+fila.append(20)
+print(fila.popleft())             # 10 (sai pelo INÍCIO)
+print(fila[0])                    # espia o primeiro sem tirar</pre>
+
+<h3>Molde 1110 (cartas): "tira da frente, joga no fim"</h3>
+<pre>from collections import deque
+n = int(input())
+fila = deque()
+for i in range(1, n + 1):          # 1..n
+    fila.append(i)
+descartadas = []
+while len(fila) &gt;= 2:
+    descartadas.append(fila.popleft())   # joga fora o topo
+    fila.append(fila.popleft())          # próxima vai pro fim
+textos = []
+for carta in descartadas:
+    textos.append(str(carta))
+print("Discarded cards: " + ", ".join(textos))
+print("Remaining card:", fila[0])</pre>
+<div class="tip"><code>fila.append(fila.popleft())</code> lê-se <strong>de dentro pra fora</strong>: 1º tira da frente, 2º põe no fim.</div>
+
+<h2>5. Molde de leitura (aparece em quase TODO problema)</h2>
+<pre># "A primeira linha tem N, depois vêm N casos"
+n = int(input())
+for i in range(n):
+    linha = input()
+    pilha = []          # zere AQUI DENTRO a cada caso!
+    resultado = 0
+    for c in linha:     # percorre letra a letra
+        ...
+    print(resultado)
+
+# "A entrada termina com 0"
+while True:
+    n = int(input())
+    if n == 0:
+        break           # aqui o break É o certo
+    ...</pre>
+<div class="tip">Variável de <em>cada caso</em> (pilha, contador) se zera <strong>dentro</strong> do <code>for</code>, senão sobra lixo do caso anterior.</div>
+
+<h2 class="quebra">6. Ordenação</h2>
+<pre>v = [7, 2, 9, 4, 1]
+v.sort()
+print(v[0])      # 1  (menor)
+print(v[-1])     # 9  (maior)</pre>
+<p><strong>Estável</strong> = itens iguais mantêm a ordem original que tinham.</p>
+
+<h3>Insertion Sort (Kahoot 3) e contagem de trocas</h3>
+<pre>v = [3, 1, 2]
+trocas = 0
+for i in range(1, len(v)):
+    j = i
+    while j &gt; 0 and v[j] &lt; v[j - 1]:
+        v[j], v[j - 1] = v[j - 1], v[j]    # troca SEM variável temporária
+        trocas += 1
+        j -= 1
+print(trocas)    # 2</pre>
+<div class="tip">Os 3 comandos dentro do <code>while</code> precisam estar <strong>indentados</strong> (no Kahoot estavam sem). Troca de vizinhos fora de ordem = <em>Bubble/Insertion</em> (1162 usa isso).</div>
+
+<h2>7. Busca</h2>
+<table>
+<tr><th>Linear</th><th>Binária</th></tr>
+<tr><td>Olha um por um</td><td>Olha o MEIO e descarta metade</td></tr>
+<tr><td>Funciona em qualquer vetor</td><td><strong>Exige vetor ORDENADO</strong> (por isso se ordena antes)</td></tr>
+<tr><td>Melhor com poucos elementos</td><td>Muito menos comparações em vetores grandes</td></tr>
+</table>
+<pre>vetor = [5, 10, 15, 20, 25, 30, 35]
+inicio = 0
+fim = len(vetor) - 1
+meio = (inicio + fim) // 2       # = 3
+if vetor[meio] &lt; 25:
+    inicio = meio + 1            # alvo está à DIREITA
+# se vetor[meio] &gt; alvo: fim = meio - 1  (alvo à ESQUERDA)</pre>
+<p><strong>Pronto:</strong> <code>from bisect import bisect_left, bisect_right</code>. Só diferem com <strong>duplicatas</strong> (left = borda esquerda; right = borda direita).</p>
+
+<h2 class="quebra">8. Fila de prioridade (heapq)</h2>
+<pre>import heapq
+heap = []
+heapq.heappush(heap, 5)
+heapq.heappush(heap, 1)
+print(heapq.heappop(heap))    # 1  (sai o MENOR primeiro)
+
+# Para sair o MAIOR primeiro: guarde o valor NEGADO
+heapq.heappush(heap, -x)
+maior = -heapq.heappop(heap)</pre>
+
+<h2>9. Texto (string)</h2>
+<pre>invertido = ""
+for letra in "DADOS":
+    invertido += letra        # concatena
+# cuidado: laço grande com "+" copia a string toda vez (lento)
+", ".join(lista_de_textos)    # 1 cópia só. Separador fica ENTRE os itens</pre>
+
+<h2>10. Qual estrutura usar? (pergunta teórica comum)</h2>
+<table>
+<tr><th>Preciso de...</th><th>Uso</th></tr>
+<tr><td>Último a entrar sai primeiro (desfazer, parênteses, recursão)</td><td><code>list</code> com <code>append</code>/<code>pop</code></td></tr>
+<tr><td>Primeiro a entrar sai primeiro (impressão, atendimento)</td><td><code>deque</code> com <code>append</code>/<code>popleft</code></td></tr>
+<tr><td>Sempre o maior/menor primeiro</td><td><code>heapq</code></td></tr>
+<tr><td>Procurar rápido</td><td>ordenar + busca binária (<code>bisect</code>)</td></tr>
+<tr><td>Percurso contínuo (escalonamento)</td><td>lista circular</td></tr>
+</table>
+<p><strong>Teoria dos Kahoots:</strong> pilha em vetor estoura por <em>limite estático</em>; a pilha da máquina guarda <em>frames de chamada</em>; pós-fixa empilha <em>operandos</em> (e operadores).</p>
+
+<hr>
+<p><em>Dúvida? Pergunte ao seu agente — ele é seu professor aqui.</em> ·
+Fonte: <a href="https://docs.python.org/pt-br/3/tutorial/datastructures.html#using-lists-as-stacks">Docs Python: listas como pilhas e filas</a> ·
+<a href="https://docs.python.org/3/library/collections.html#collections.deque">collections.deque</a> ·
+<a href="https://docs.python.org/3/library/heapq.html">heapq</a> ·
+<a href="https://docs.python.org/3/library/bisect.html">bisect</a></p>
+</body>
+</html>
